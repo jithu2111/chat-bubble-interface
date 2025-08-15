@@ -3,20 +3,22 @@ import './App.css';
 import ChatBubble from './components/ChatBubble';
 import MessageInput from './components/MessageInput';
 import TypingIndicator from './components/TypingIndicator';
-import { config, getApiUrl, validateConfig } from './config';
+import { config, validateConfig } from './config';
+import openaiService from './services/openaiService';
 
 function App() {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "How can I help you create structured composing lessons? Can you tell me the grade level for this?",
+      text: config.chat.welcomeMessage,
       sender: 'ai',
       timestamp: new Date(),
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [threadId, setThreadId] = useState(null); // Store OpenAI thread ID
+  const [threadId, setThreadId] = useState(null);
+  const [apiError, setApiError] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -28,11 +30,20 @@ function App() {
   }, [messages]);
 
   useEffect(() => {
-    validateConfig();
+    const isValid = validateConfig();
+    if (!isValid) {
+      setApiError('OpenAI API key not configured. Please add your API key to the environment variables.');
+    }
   }, []);
 
   const handleSendMessage = async (message) => {
-    if (!message.trim()) return;
+    if (!message.trim() || isTyping) return;
+
+    // Check for API configuration
+    if (!config.openai.apiKey) {
+      setApiError('OpenAI API key not configured. Please add REACT_APP_OPENAI_API_KEY to your environment variables.');
+      return;
+    }
 
     const userMessage = {
       id: Date.now(),
@@ -44,80 +55,68 @@ function App() {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
+    setApiError(null);
 
     try {
-      // API call to your Wix backend - matching the expected format
-      const response = await fetch(getApiUrl(), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question: message,           // Your backend expects 'question'
-          conversationHistory: null,   // Your backend expects this
-          threadId: threadId          // For conversation continuity
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('Backend response:', data); // For debugging
+      console.log('Sending message to OpenAI...');
+      const result = await openaiService.sendMessage(message, threadId);
       
       // Typing delay for better UX
       setTimeout(() => {
-        let aiResponseText = "I'm here to help with your teaching questions!";
-        
-        // Handle your Wix backend response format
-        if (data.success && data.response) {
-          aiResponseText = data.response;
+        if (result.success) {
+          const aiMessage = {
+            id: Date.now() + 1,
+            text: result.response,
+            sender: 'ai',
+            timestamp: new Date(),
+          };
+          setMessages(prev => [...prev, aiMessage]);
           
           // Store thread ID for conversation continuity
-          if (data.threadId) {
-            setThreadId(data.threadId);
-            console.log('Thread ID stored:', data.threadId);
+          if (result.threadId) {
+            setThreadId(result.threadId);
+            console.log('Thread ID stored:', result.threadId);
           }
-        } else if (data.error) {
-          aiResponseText = `I'm sorry, I encountered an error: ${data.error}`;
+        } else {
+          const errorMessage = {
+            id: Date.now() + 1,
+            text: `I'm sorry, I encountered an error: ${result.error}`,
+            sender: 'ai',
+            timestamp: new Date(),
+          };
+          setMessages(prev => [...prev, errorMessage]);
         }
-
-        const aiMessage = {
-          id: Date.now() + 1,
-          text: aiResponseText,
-          sender: 'ai',
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, aiMessage]);
         setIsTyping(false);
       }, config.chat.typingDelay);
 
     } catch (error) {
       console.error('Error sending message:', error);
       
-      // More detailed error handling
       setTimeout(() => {
-        let errorMessage = "I'm having trouble connecting right now. Please try again later.";
-        
-        if (error.message.includes('CORS')) {
-          errorMessage = "Connection blocked. Please check CORS settings.";
-        } else if (error.message.includes('404')) {
-          errorMessage = "Backend endpoint not found. Please check the API URL.";
-        } else if (error.message.includes('500')) {
-          errorMessage = "Server error occurred. Please try again.";
-        }
-
-        const aiMessage = {
+        const errorMessage = {
           id: Date.now() + 1,
-          text: errorMessage,
+          text: "I'm having trouble connecting right now. Please try again later.",
           sender: 'ai',
           timestamp: new Date(),
         };
-        setMessages(prev => [...prev, aiMessage]);
+        setMessages(prev => [...prev, errorMessage]);
         setIsTyping(false);
       }, config.chat.typingDelay);
     }
+  };
+
+  const clearChat = () => {
+    setMessages([
+      {
+        id: 1,
+        text: config.chat.welcomeMessage,
+        sender: 'ai',
+        timestamp: new Date(),
+      }
+    ]);
+    setThreadId(null);
+    setApiError(null);
+    console.log('Chat cleared, new conversation started');
   };
 
   return (
@@ -126,6 +125,11 @@ function App() {
         <div className="chat-header">
           <h2>Teaching Assistant</h2>
           <p>Ask me anything about teaching!</p>
+          {apiError && (
+            <div className="api-error">
+              ⚠️ {apiError}
+            </div>
+          )}
         </div>
         
         <div className="messages-container">
@@ -139,12 +143,21 @@ function App() {
           <div ref={messagesEndRef} />
         </div>
         
-        <MessageInput
-          value={inputValue}
-          onChange={setInputValue}
-          onSend={handleSendMessage}
-          disabled={isTyping}
-        />
+        <div className="chat-footer">
+          <MessageInput
+            value={inputValue}
+            onChange={setInputValue}
+            onSend={handleSendMessage}
+            disabled={isTyping || !!apiError}
+          />
+          <button 
+            onClick={clearChat}
+            className="clear-button"
+            disabled={isTyping}
+          >
+            Clear Chat
+          </button>
+        </div>
       </div>
     </div>
   );

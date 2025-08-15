@@ -1,28 +1,32 @@
 // Configuration file for Chat Bubble Interface
 export const config = {
-  // API Configuration
-  api: {
-    baseUrl: 'https://www.composeearly.com/_functions',
-    endpoint: '/getTeachingAdvice',
-    timeout: 30000, // 30 seconds (increased for OpenAI calls)
+  // OpenAI Configuration
+  openai: {
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    assistantId: process.env.REACT_APP_ASSISTANT_ID || 'asst_7pZxP4e5FEBHfeBVrhpkCBVJ',
+    baseUrl: 'https://api.openai.com/v1',
+    timeout: 30000, // 30 seconds
   },
   
   // Chat Configuration
   chat: {
     maxMessageLength: 1000,
-    typingDelay: 1000, // milliseconds
+    typingDelay: 1000,
     autoScroll: true,
     showTimestamps: true,
+    welcomeMessage: "How can I help you create structured composing lessons? Can you tell me the grade level for this?",
   },
   
   // UI Configuration
   ui: {
-    theme: 'default', // 'default', 'dark', 'custom'
+    theme: 'default',
     colors: {
-      primary: '#2563eb', // Blue to match your site
+      primary: '#2563eb',
       secondary: '#6c757d',
       background: '#f8f9fa',
       text: '#212529',
+      userBubble: '#2563eb',
+      aiBubble: '#f3f4f6',
     },
     animations: {
       enabled: true,
@@ -33,22 +37,26 @@ export const config = {
   // Features
   features: {
     typingIndicator: true,
-    messageHistory: false, // Set to true to persist messages
+    messageHistory: false,
     fileUpload: false,
     voiceMessages: false,
   },
 };
 
-// Helper function to get full API URL
-export const getApiUrl = () => {
-  return `${config.api.baseUrl}${config.api.endpoint}`;
-};
-
-// Helper function to validate configuration
+// Validate configuration
 export const validateConfig = () => {
-  if (config.api.baseUrl === 'YOUR_WIX_BACKEND_URL') {
-    console.warn('Please update the API base URL in config.js');
+  if (!config.openai.apiKey) {
+    console.error('⚠️  OpenAI API key not found. Please add REACT_APP_OPENAI_API_KEY to your environment variables.');
+    return false;
+  }
+  if (!config.openai.assistantId) {
+    console.error('⚠️  OpenAI Assistant ID not found.');
     return false;
   }
   return true;
+};
+
+// Helper function to get full API URL
+export const getApiUrl = () => {
+  return `${config.openai.baseUrl}`;
 };

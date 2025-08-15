@@ -60,9 +60,49 @@
   border-radius: 3px;
 }
 
-.messages-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
+  .messages-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+
+  .chat-footer {
+    padding: 20px;
+    background: white;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .clear-button {
+    padding: 10px 20px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s ease;
+    align-self: center;
+  }
+
+  .clear-button:hover:not(:disabled) {
+    background: #545b62;
+  }
+
+  .clear-button:disabled {
+    background: #adb5bd;
+    cursor: not-allowed;
+  }
+
+  .api-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+  }
 
 /* Mobile responsive */
 @media (max-width: 480px) {
