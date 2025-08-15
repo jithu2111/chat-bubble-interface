@@ -25,6 +25,64 @@
   word-wrap: break-word;
 }
 
+.message-paragraph {
+  margin-bottom: 8px;
+}
+
+.message-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.message-line {
+  margin-bottom: 4px;
+}
+
+.message-line:last-child {
+  margin-bottom: 0;
+}
+
+.list-item {
+  margin-bottom: 4px;
+  padding-left: 8px;
+  position: relative;
+}
+
+.list-item:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: inherit;
+}
+
+.list-item:last-child {
+  margin-bottom: 0;
+}
+
+.message-heading {
+  margin: 12px 0 8px 0;
+  font-weight: 600;
+  color: inherit;
+}
+
+.message-heading.h1 {
+  font-size: 1.3rem;
+  margin-top: 16px;
+}
+
+.message-heading.h2 {
+  font-size: 1.2rem;
+  margin-top: 14px;
+}
+
+.message-heading.h3 {
+  font-size: 1.1rem;
+  margin-top: 12px;
+}
+
+.message-bold {
+  font-weight: 600;
+}
+
 .chat-bubble.user .message-text {
   background: #6366f1;
   color: white;
