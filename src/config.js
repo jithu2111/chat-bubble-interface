@@ -2,9 +2,9 @@
 export const config = {
   // API Configuration
   api: {
-    baseUrl: process.env.REACT_APP_API_URL || 'YOUR_WIX_BACKEND_URL',
+    baseUrl: 'https://www.composeearly.com/_functions',
     endpoint: '/getTeachingAdvice',
-    timeout: 10000, // 10 seconds
+    timeout: 30000, // 30 seconds (increased for OpenAI calls)
   },
   
   // Chat Configuration
@@ -19,7 +19,7 @@ export const config = {
   ui: {
     theme: 'default', // 'default', 'dark', 'custom'
     colors: {
-      primary: '#007bff',
+      primary: '#2563eb', // Blue to match your site
       secondary: '#6c757d',
       background: '#f8f9fa',
       text: '#212529',
@@ -47,7 +47,7 @@ export const getApiUrl = () => {
 // Helper function to validate configuration
 export const validateConfig = () => {
   if (config.api.baseUrl === 'YOUR_WIX_BACKEND_URL') {
-    console.warn('⚠️  Please update the API base URL in config.js');
+    console.warn('Please update the API base URL in config.js');
     return false;
   }
   return true;
