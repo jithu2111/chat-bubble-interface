@@ -4,7 +4,7 @@ import ChatBubble from './components/ChatBubble';
 import MessageInput from './components/MessageInput';
 import TypingIndicator from './components/TypingIndicator';
 import { config, validateConfig } from './config';
-import wixProxyService from './services/wixProxyService';
+import openaiService from './services/openaiService';
 
 function App() {
   const [messages, setMessages] = useState([
@@ -19,7 +19,6 @@ function App() {
   const [inputValue, setInputValue] = useState('');
   const [threadId, setThreadId] = useState(null);
   const [apiError, setApiError] = useState(null);
-  const [isConfigured, setIsConfigured] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -30,28 +29,21 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
-  // Initialize configuration for Wix backend
   useEffect(() => {
-    setIsConfigured(true);
-    setApiError(null);
-  }, []);
-
-  useEffect(() => {
-    // Only validate if we have a configuration
-    if (isConfigured) {
-      const isValid = validateConfig();
-      if (!isValid) {
-        setApiError('OpenAI configuration not received from parent. Please check your Wix setup.');
-      }
-    } else {
-      setApiError('Waiting for configuration from Wix...');
+    const isValid = validateConfig();
+    if (!isValid) {
+      setApiError('OpenAI API key not configured. Please check your GitHub Secrets setup.');
     }
-  }, [isConfigured]);
+  }, []);
 
   const handleSendMessage = async (message) => {
     if (!message.trim() || isTyping) return;
 
-
+    // Check for API configuration
+    if (!config.openai.apiKey) {
+      setApiError('OpenAI API key not configured. Please check your GitHub Secrets setup.');
+      return;
+    }
 
     const userMessage = {
       id: Date.now(),
@@ -66,8 +58,8 @@ function App() {
     setApiError(null);
 
     try {
-      console.log('Sending message to Wix backend...');
-      const result = await wixProxyService.sendMessage(message, threadId);
+      console.log('Sending message to OpenAI...');
+      const result = await openaiService.sendMessage(message, threadId);
       
       // Typing delay for better UX
       setTimeout(() => {
@@ -156,7 +148,7 @@ function App() {
             value={inputValue}
             onChange={setInputValue}
             onSend={handleSendMessage}
-            disabled={isTyping || !!apiError || !isConfigured}
+            disabled={isTyping || !!apiError}
           />
           <button 
             onClick={clearChat}
