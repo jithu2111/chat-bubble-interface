@@ -123,8 +123,8 @@ function App() {
     <div className="App">
       <div className="chat-container">
         <div className="chat-header">
-          <h2>Teaching Assistant</h2>
-          <p>Ask me anything about teaching!</p>
+          <h2>Compose Early</h2>
+          <p>AI Lesson Planning Tool</p>
           {apiError && (
             <div className="api-error">
               ⚠️ {apiError}

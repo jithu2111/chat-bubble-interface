@@ -11,15 +11,15 @@ const ChatBubble = ({ message }) => {
 
   return (
     <div className={`chat-bubble ${message.sender === 'user' ? 'user' : 'ai'}`}>
+      {message.sender === 'ai' && (
+        <div className="avatar">
+          <span>CE</span>
+        </div>
+      )}
       <div className="message-content">
         <div className="message-text">{message.text}</div>
         <div className="message-time">{formatTime(message.timestamp)}</div>
       </div>
-      {message.sender === 'ai' && (
-        <div className="avatar">
-          <span>AI</span>
-        </div>
-      )}
     </div>
   );
 };

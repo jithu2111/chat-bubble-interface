@@ -39,12 +39,12 @@
   font-size: 0.9rem;
 }
 
-.messages-container {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  background: #f8f9fa;
-}
+  .messages-container {
+    flex: 1;
+    padding: 10px 20px 15px 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+  }
 
 .messages-container::-webkit-scrollbar {
   width: 6px;
@@ -65,12 +65,12 @@
   }
 
   .chat-footer {
-    padding: 20px;
+    padding: 10px 20px;
     background: white;
     border-top: 1px solid #e9ecef;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
   }
 
   .clear-button {

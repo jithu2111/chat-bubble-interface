@@ -5,7 +5,7 @@ const TypingIndicator = () => {
   return (
     <div className="typing-indicator">
       <div className="avatar">
-        <span>AI</span>
+        <span>CE</span>
       </div>
       <div className="typing-bubble">
         <div className="typing-dots">

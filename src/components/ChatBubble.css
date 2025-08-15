@@ -26,7 +26,7 @@
 }
 
 .chat-bubble.user .message-text {
-  background: #007bff;
+  background: #6366f1;
   color: white;
   border-bottom-right-radius: 6px;
 }
@@ -59,7 +59,7 @@
   justify-content: center;
   font-size: 0.8rem;
   font-weight: 600;
-  margin-right: 8px;
+  margin-right: 12px;
   flex-shrink: 0;
 }
 
