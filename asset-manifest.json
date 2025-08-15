@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/chat-bubble-interface/static/css/main.38cc2e6d.css",
+    "main.js": "/chat-bubble-interface/static/js/main.45663503.js",
+    "index.html": "/chat-bubble-interface/index.html",
+    "main.38cc2e6d.css.map": "/chat-bubble-interface/static/css/main.38cc2e6d.css.map",
+    "main.45663503.js.map": "/chat-bubble-interface/static/js/main.45663503.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.38cc2e6d.css",
+    "static/js/main.45663503.js"
+  ]
+}
