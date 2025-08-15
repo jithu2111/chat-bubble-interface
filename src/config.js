@@ -1,10 +1,9 @@
 // Configuration file for Chat Bubble Interface
 export const config = {
-  // OpenAI Configuration
-  openai: {
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-    assistantId: process.env.REACT_APP_ASSISTANT_ID || 'asst_7pZxP4e5FEBHfeBVrhpkCBVJ',
-    baseUrl: 'https://api.openai.com/v1',
+  // Wix Backend Configuration
+  backend: {
+    baseUrl: 'https://www.composeearly.com/_functions',
+    endpoint: '/chatbot',
     timeout: 30000, // 30 seconds
   },
   
@@ -25,7 +24,7 @@ export const config = {
       secondary: '#6c757d',
       background: '#f8f9fa',
       text: '#212529',
-      userBubble: '#2563eb',
+      userBubble: '#6366f1',
       aiBubble: '#f3f4f6',
     },
     animations: {
@@ -45,18 +44,18 @@ export const config = {
 
 // Validate configuration
 export const validateConfig = () => {
-  if (!config.openai.apiKey) {
-    console.error('⚠️  OpenAI API key not found. Please add REACT_APP_OPENAI_API_KEY to your environment variables.');
+  if (!config.backend.baseUrl) {
+    console.error('⚠️  Backend base URL not configured.');
     return false;
   }
-  if (!config.openai.assistantId) {
-    console.error('⚠️  OpenAI Assistant ID not found.');
+  if (!config.backend.endpoint) {
+    console.error('⚠️  Backend endpoint not configured.');
     return false;
   }
   return true;
 };
 
-// Helper function to get full API URL
-export const getApiUrl = () => {
-  return `${config.openai.baseUrl}`;
+// Helper function to get full backend URL
+export const getBackendUrl = () => {
+  return `${config.backend.baseUrl}${config.backend.endpoint}`;
 };

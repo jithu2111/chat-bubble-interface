@@ -8,6 +8,12 @@ class OpenAIService {
     this.baseUrl = config.openai.baseUrl;
   }
 
+  updateConfig(apiKey, assistantId) {
+    this.apiKey = apiKey;
+    this.assistantId = assistantId;
+    console.log('OpenAI service configuration updated');
+  }
+
   async createThread() {
     try {
       const response = await fetch(`${this.baseUrl}/threads`, {

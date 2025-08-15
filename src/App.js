@@ -4,7 +4,7 @@ import ChatBubble from './components/ChatBubble';
 import MessageInput from './components/MessageInput';
 import TypingIndicator from './components/TypingIndicator';
 import { config, validateConfig } from './config';
-import openaiService from './services/openaiService';
+import wixProxyService from './services/wixProxyService';
 
 function App() {
   const [messages, setMessages] = useState([
@@ -19,6 +19,7 @@ function App() {
   const [inputValue, setInputValue] = useState('');
   const [threadId, setThreadId] = useState(null);
   const [apiError, setApiError] = useState(null);
+  const [isConfigured, setIsConfigured] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -29,21 +30,28 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
+  // Initialize configuration for Wix backend
   useEffect(() => {
-    const isValid = validateConfig();
-    if (!isValid) {
-      setApiError('OpenAI API key not configured. Please add your API key to the environment variables.');
-    }
+    setIsConfigured(true);
+    setApiError(null);
   }, []);
+
+  useEffect(() => {
+    // Only validate if we have a configuration
+    if (isConfigured) {
+      const isValid = validateConfig();
+      if (!isValid) {
+        setApiError('OpenAI configuration not received from parent. Please check your Wix setup.');
+      }
+    } else {
+      setApiError('Waiting for configuration from Wix...');
+    }
+  }, [isConfigured]);
 
   const handleSendMessage = async (message) => {
     if (!message.trim() || isTyping) return;
 
-    // Check for API configuration
-    if (!config.openai.apiKey) {
-      setApiError('OpenAI API key not configured. Please add REACT_APP_OPENAI_API_KEY to your environment variables.');
-      return;
-    }
+
 
     const userMessage = {
       id: Date.now(),
@@ -58,8 +66,8 @@ function App() {
     setApiError(null);
 
     try {
-      console.log('Sending message to OpenAI...');
-      const result = await openaiService.sendMessage(message, threadId);
+      console.log('Sending message to Wix backend...');
+      const result = await wixProxyService.sendMessage(message, threadId);
       
       // Typing delay for better UX
       setTimeout(() => {
@@ -123,8 +131,8 @@ function App() {
     <div className="App">
       <div className="chat-container">
         <div className="chat-header">
-          <h2>Compose Early</h2>
-          <p>AI Lesson Planning Tool</p>
+          <h2>Teaching Assistant</h2>
+          <p>Ask me anything about teaching!</p>
           {apiError && (
             <div className="api-error">
               ⚠️ {apiError}
@@ -148,7 +156,7 @@ function App() {
             value={inputValue}
             onChange={setInputValue}
             onSend={handleSendMessage}
-            disabled={isTyping || !!apiError}
+            disabled={isTyping || !!apiError || !isConfigured}
           />
           <button 
             onClick={clearChat}
